@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 public class QuizActivity extends AppCompatActivity {
 
+    private final String TAG = "QuizActivity";
     private Button mTrueButton;
     private Button mFalseButton;
     private ImageButton  mNextButton;
@@ -26,11 +27,20 @@ public class QuizActivity extends AppCompatActivity {
             new Question(R.string.question_asia, true),
     };
 
+    private final String STATE_CURRENT_INDEX = "currentIndex";
     private int mCurrentIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
+
+        if(savedInstanceState != null) {
+            Log.d(TAG, "restore savedInstanceState");
+            mCurrentIndex = savedInstanceState.getInt(STATE_CURRENT_INDEX);
+        }
+
+
         setContentView(R.layout.activity_quiz);
 
         mQuestionTextView = (TextView) findViewById(R.id.question_text_view);
@@ -81,14 +91,27 @@ public class QuizActivity extends AppCompatActivity {
         updateQuestion();
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        Log.d(TAG, "onSaveInstanceState");
+        Log.d(TAG, "mCurrentIndex: " + mCurrentIndex);
+        // Save the user's current game state
+        savedInstanceState.putInt(STATE_CURRENT_INDEX, mCurrentIndex);
+
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
     private void updateQuestion() {
-        Log.d(getClass().getName(), "mCurrentIndex = " + mCurrentIndex);
+        Log.d(TAG, "updateQuestion");
+        Log.d(TAG, "mCurrentIndex = " + mCurrentIndex);
 
         int question = mQuestionBank[mCurrentIndex].getTextResId();
         mQuestionTextView.setText(question);
     }
 
     private void checkAnswer(boolean userPressedTrue) {
+        Log.d(TAG, "checkAnswer");
         boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
 
         int messageResId = 0;
