@@ -1,5 +1,6 @@
 package com.bignerdranch.android.geoquiz;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,9 +15,12 @@ public class QuizActivity extends AppCompatActivity {
     private final String TAG = "QuizActivity";
     private Button mTrueButton;
     private Button mFalseButton;
+    private Button mCheatButton;
     private ImageButton  mNextButton;
     private ImageButton  mPreviousButton;
     private TextView mQuestionTextView;
+
+    private boolean EXTRA_IS_CHEATER;
 
     private Question[] mQuestionBank = new Question[] {
             new Question(R.string.question_australia, true),
@@ -67,6 +71,16 @@ public class QuizActivity extends AppCompatActivity {
                 checkAnswer(false);
             }
         });
+
+        mCheatButton = (Button) findViewById(R.id.cheat_button);
+        mCheatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "cheat button clicked");
+                showCheatActivity();
+            }
+        });
+
 
         mNextButton = (ImageButton) findViewById(R.id.next_button);
         mNextButton.setOnClickListener(new View.OnClickListener() {
@@ -125,4 +139,25 @@ public class QuizActivity extends AppCompatActivity {
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT)
                 .show();
     }
+
+    private void showCheatActivity() {
+        Log.d(TAG,"showCheatActivity");
+
+        boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
+
+        Intent intent = new Intent(getBaseContext(), CheatActivity.class);
+        intent.putExtra("EXTRA_ANSWER_IS_TRUE", answerIsTrue);
+        startActivityForResult(intent, 0);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0) {
+            if (resultCode == RESULT_OK) {
+                Toast.makeText(this, R.string.cheater_toast, Toast.LENGTH_LONG)
+                        .show();
+            }
+        }
+    }
+
 }
